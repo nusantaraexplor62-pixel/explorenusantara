@@ -54,3 +54,21 @@ input, textarea {
     background: white;
     font-family: inherit;
 }
+
+
+
+.btn-edit-small {
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 5px;
+    transition: 0.2s;
+}
+
+.btn-edit-small:hover {
+    background: #e0e0e0;
+}
