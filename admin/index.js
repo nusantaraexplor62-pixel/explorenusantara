@@ -21,7 +21,8 @@ L.control.zoom({ position: 'bottomright' }).addTo(map);
 let dataWisata = [];
 let markers = {};
 
-// Ambil Data dari Firestore secara Realtime
+let editId = null;
+
 db.collection('wisata').onSnapshot((snapshot) => {
     Object.values(markers).forEach(m => map.removeLayer(m));
     dataWisata = [];
@@ -39,14 +40,20 @@ db.collection('wisata').onSnapshot((snapshot) => {
                     <span style="font-size:10px; background:#eee; padding:2px 6px; border-radius:5px">${item.category}</span>
                     <b style="font-size:16px; display:block; margin-top:5px">${item.name}</b>
                     <p style="font-size:11px; color:#666; margin:5px 0">📍 ${item.address}</p>
-                    <p style="font-size:11px; color:#333;">👥 Kapasitas: <b>${item.capacity} orang</b></p>
-                    <hr>
-                    <p style="font-size:12px; color:#666;">${item.desc}</p>
+                    <p style="font-size:11px; color:#333; margin:5px 0">👥 Kapasitas: <b>${item.capacity} orang</b></p>
+                    
+                    <p style="font-size:12px; color:#555; line-height:1.4; margin:8px 0 0; border-top:1px dashed #ddd; padding-top:8px;">
+                        ${item.desc || 'Tidak ada deskripsi.'}
+                    </p>
+                    
+                    <hr style="border:0; border-top:1px solid #eee; margin:10px 0 5px;">
+                    <button class="btn-edit-small" onclick="prepareEdit('${id}')">📝 Edit Data</button>
                 </div>
             </div>
         `, { padding: [0, 0] });
         markers[id] = marker;
     });
+
 
 
 }, (error) => {
@@ -91,7 +98,31 @@ async function getAddress(lat, lng) {
         return "Gagal memuat alamat";
     }
 }
+function prepareEdit(id) {
+    const item = dataWisata.find(w => w.id === id);
+    if (!item) return;
 
+    // Isi form dengan data lama
+    document.getElementById('name').value = item.name;
+    document.getElementById('latlng').value = item.coords.join(', ');
+    document.getElementById('category').value = item.category;
+    document.getElementById('capacity').value = item.capacity;
+    document.getElementById('imgUrl').value = item.img;
+    document.getElementById('desc').value = item.desc;
+
+    // Ubah status ke mode edit
+    editId = id;
+    
+    // Tampilkan panel admin dan ubah teks tombol
+    const panel = document.getElementById('adminPanel');
+    panel.style.display = 'block';
+    const btnSimpan = document.querySelector('#adminPanel .btn');
+    btnSimpan.innerText = "Update Data Wisata";
+    btnSimpan.style.background = "#28a745"; // Warna hijau untuk update
+
+    // Scroll ke form
+    panel.scrollIntoView({ behavior: 'smooth' });
+}
 // 2. Fungsi Simpan Data
 async function saveData() {
     const name = document.getElementById('name').value;
@@ -101,37 +132,35 @@ async function saveData() {
     const img = document.getElementById('imgUrl').value;
     const desc = document.getElementById('desc').value;
 
-    if (!name || !latlngStr || !img) return alert("Wajib isi Nama, Koordinat, dan Gambar!");
-
-    // Menampilkan loading sederhana di console
-    console.log("Sedang mengambil alamat...");
+    if (!name || !latlngStr || !img) return alert("Lengkapi data!");
 
     const coords = latlngStr.split(',').map(n => parseFloat(n.trim()));
-    
-    try {
-        // Memanggil fungsi getAddress dengan keyword 'await'
-        const address = await getAddress(coords[0], coords[1]);
+    const address = await getAddress(coords[0], coords[1]);
 
-        await db.collection('wisata').add({
-            name: name,
-            coords: coords,
-            category: category,
-            capacity: capacity || "Tidak dibatasi",
-            address: address, 
-            img: img,
-            desc: desc,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
+    const finalData = {
+        name, coords, category, capacity, address, img, desc,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
 
-        alert("Berhasil disimpan dengan alamat: " + address);
-        
-        // Reset form
-        document.querySelectorAll('#adminPanel input, #adminPanel textarea').forEach(i => i.value = '');
-        toggleAdmin();
-
-    } catch (error) {
-        console.error("Gagal simpan:", error);
-        alert("Terjadi kesalahan: " + error.message);
+    if (editId) {
+        // MODE UPDATE
+        db.collection('wisata').doc(editId).update(finalData)
+        .then(() => {
+            alert("Data berhasil diperbarui!");
+            resetForm();
+        })
+        .catch(err => alert("Gagal update: " + err.message));
+    } else {
+        // MODE SIMPAN BARU
+        db.collection('wisata').add({
+            ...finalData,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then(() => {
+            alert("Data baru tersimpan!");
+            resetForm();
+        })
+        .catch(err => alert("Gagal simpan: " + err.message));
     }
 }
 
@@ -141,4 +170,15 @@ function toggleAdmin() {
     if (panel) {
         panel.style.display = (panel.style.display === 'none' || panel.style.display === '') ? 'block' : 'none';
     }
+}
+
+
+
+function resetForm() {
+    editId = null;
+    document.querySelectorAll('#adminPanel input, #adminPanel textarea').forEach(i => i.value = '');
+    const btnSimpan = document.querySelector('#adminPanel .btn');
+    btnSimpan.innerText = "Simpan ke Firestore";
+    btnSimpan.style.background = "#007aff";
+    toggleAdmin();
 }
