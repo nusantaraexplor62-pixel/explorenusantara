@@ -1,0 +1,56 @@
+:root { --apple-blue: #007aff; --glass: rgba(255, 255, 255, 0.85); }
+body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, sans-serif; overflow: hidden; }
+#map { width: 100%; height: 100vh; z-index: 1; }
+
+.ui-container {
+    position: absolute; top: 10px; left: 10px; right: 10px;
+    z-index: 1000; display: flex; flex-direction: column; gap: 8px; max-width: 400px;
+}
+
+.card {
+    background: var(--glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    padding: 15px; border-radius: 18px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.4);
+}
+
+.title { margin: 0 0 10px; font-size: 18px; font-weight: 700; color: #1d1d1f; }
+
+input, textarea {
+    width: 100%; padding: 12px; margin-top: 8px; border-radius: 10px;
+    border: 1px solid #ddd; box-sizing: border-box; font-size: 14px; outline: none;
+}
+
+.btn {
+    background: var(--apple-blue); color: white; border: none; padding: 12px;
+    border-radius: 10px; width: 100%; margin-top: 10px; font-weight: 600; cursor: pointer;
+}
+
+.btn-admin-toggle { background: #555; font-size: 11px; padding: 6px; margin-top: 15px; }
+
+.search-results {
+    background: white; border-radius: 12px; max-height: 250px; overflow-y: auto;
+    display: none; margin-top: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.result-item {
+    padding: 12px; border-bottom: 1px solid #f2f2f2; display: flex; align-items: center; gap: 12px; cursor: pointer;
+}
+
+.result-item img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; }
+
+#adminPanel { display: none; }
+
+@media (min-width: 768px) { .ui-container { top: 20px; left: 20px; } }
+
+
+
+/* Tambahkan ini di style.css */
+.styled-input {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background: white;
+    font-family: inherit;
+}

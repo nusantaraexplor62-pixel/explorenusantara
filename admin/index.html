@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jelajah Nusantara - Firestore Edition</title>
+    
+    <!-- CSS Library -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+    <div class="ui-container">
+        <!-- Search Card -->
+        <div class="card">
+            <h3 class="title">📍 Jelajah Nusantara</h3>
+            <input type="text" id="searchInput" placeholder="Cari destinasi terdaftar...">
+            <div id="searchResults" class="search-results"></div>
+            <button class="btn btn-admin-toggle" onclick="toggleAdmin()">Mode Admin</button>
+        </div>
+
+        <!-- Admin Input Card -->
+       <!-- Cari bagian Admin Input Card di index.html dan ganti dengan ini -->
+<div id="adminPanel" class="card">
+    <h4 style="margin:0">Tambah Wisata (Firestore)</h4>
+    <input type="text" id="name" placeholder="Nama Wisata">
+    <input type="text" id="latlng" placeholder="Koordinat (contoh: -7.6, 110.2)">
+    
+    <!-- Input Baru -->
+    <select id="category" class="styled-input">
+        <option value="Alam">🌿 Alam</option>
+        <option value="Taman Bermain">🎡 Taman Bermain</option>
+        <option value="Budaya/Sejarah">🏛️ Budaya/Sejarah</option>
+        <option value="Kuliner">🍲 Kuliner</option>
+        <option value="Religi">🕌 Religi</option>
+    </select>
+    <input type="number" id="capacity" placeholder="Kapasitas Wisatawan (Orang)">
+    
+    <input type="text" id="imgUrl" placeholder="URL Gambar (https://...)">
+    <textarea id="desc" placeholder="Deskripsi singkat"></textarea>
+    <button class="btn" onclick="saveData()">Simpan ke Firestore</button>
+</div>
+    </div>
+
+    <div id="map"></div>
+
+    <!-- Firebase SDK (Compat mode) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="index.js"></script>
+</body>
+</html>
