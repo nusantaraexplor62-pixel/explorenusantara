@@ -3,56 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Jelajah Nusantara - Firestore Edition</title>
-    
-    <!-- CSS Library -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <title>Jelajah Nusantara - Dashboard Wisata & Peta Interaktif</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
 
-    <div class="ui-container">
-        <!-- Search Card -->
-        <div class="card">
-            <h3 class="title">📍 Jelajah Nusantara</h3>
-            <input type="text" id="searchInput" placeholder="Cari destinasi terdaftar...">
-            <div id="searchResults" class="search-results"></div>
-            <button class="btn btn-admin-toggle" onclick="toggleAdmin()">Mode Admin</button>
+    <div class="main-wrapper">
+        <header class="main-header">
+            <div class="header-content">
+                <div>
+                    <h1>🗺️ Jelajah Nusantara</h1>
+                    <p>Sistem Data Wisata Terintegrasi Peta Digital & Real-time Weather</p>
+                </div>
+                <button class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle Theme">
+                    <span class="theme-icon">🌓</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="content-container">
+            <aside class="sidebar-panel">
+                <div class="card search-card">
+                    <h3 class="section-title">🔍 Pencarian Cepat</h3>
+                    <div style="position: relative; width: 100%;">
+                        <input type="text" id="searchInput" placeholder="Cari destinasi terdaftar...">
+                        <div id="searchResults" class="search-results"></div>
+                    </div>
+                    <button class="btn btn-admin-toggle" onclick="toggleAdmin()">Toggle Mode Admin</button>
+                </div>
+
+                <div id="adminPanel" class="card admin-card">
+                    <h3 class="section-title" id="formTitle">✨ Tambah Wisata Baru</h3>
+                    
+                    <div class="form-group">
+                        <label for="name">Nama Destinasi Wisata</label>
+                        <input type="text" id="name" placeholder="Contoh: Candi Borobudur">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="city">Kota / Kabupaten</label>
+                            <input type="text" id="city" placeholder="Contoh: Magelang">
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Kategori</label>
+                            <select id="category" class="styled-input">
+                                <option value="Alam">🌲 Wisata Alam</option>
+                                <option value="Taman Bermain">🎡 Taman Bermain</option>
+                                <option value="Budaya/Sejarah">🏛️ Budaya & Sejarah</option>
+                                <option value="Kuliner">🍳 Kuliner</option>
+                                <option value="Religi">🕌 Religi</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="latlng">Koordinat (Latitude, Longitude)</label>
+                            <input type="text" id="latlng" placeholder="-7.607, 110.203">
+                        </div>
+                        <div class="form-group">
+                            <label for="capacity">Kapasitas (Orang)</label>
+                            <input type="number" id="capacity" placeholder="1000">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="imgUrl">URL Gambar Cover</label>
+                        <input type="text" id="imgUrl" placeholder="https://domain.com/gambar.jpg">
+                    </div>
+
+                    <div class="price-section">
+                        <h4 class="price-title"> Harga Tiket</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="priceSingle">Harga Satuan</label>
+                                <input type="number" id="priceSingle" placeholder="Rp">
+                            </div>
+                            <div class="form-group">
+                                <label for="priceBundling">Harga Bundling</label>
+                                <input type="number" id="priceBundling" placeholder="Rp">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="pricePromo">Harga Promo</label>
+                                <input type="number" id="pricePromo" placeholder="Rp">
+                            </div>
+                            <div class="form-group">
+                                <label for="pricePromoPeriod">Periode Promo</label>
+                                <input type="text" id="pricePromoPeriod" placeholder="Contoh: 1-31 Mei">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label for="desc">Deskripsi Singkat Wisata</label>
+                        <textarea id="desc" rows="3" placeholder="Jelaskan daya tarik singkat destinasi ini..."></textarea>
+                    </div>
+
+                    <button class="btn btn-primary" id="btnSubmit" onclick="saveData()">Simpan ke Firestore</button>
+                    <button class="btn btn-secondary" id="btnReset" onclick="resetForm()" style="display:none; margin-top: 8px;">Batal Edit</button>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <div class="card data-card">
+                    
+                    <div class="controls-wrapper">
+                        <div class="filter-section-buttons">
+                            <span class="filter-label">🗂️ Filter Kategori:</span>
+                            <div class="category-buttons-container">
+                                <button class="btn-filter-cat active" data-category="All" onclick="toggleCategoryFilter('All')">🌍 Semua <span id="countAll">(0)</span></button>
+                                <button class="btn-filter-cat" data-category="Alam" onclick="toggleCategoryFilter('Alam')">🌲 Alam <span id="countAlam">(0)</span></button>
+                                <button class="btn-filter-cat" data-category="Taman Bermain" onclick="toggleCategoryFilter('Taman Bermain')">🎡 Taman Bermain <span id="countTaman">(0)</span></button>
+                                <button class="btn-filter-cat" data-category="Budaya/Sejarah" onclick="toggleCategoryFilter('Budaya/Sejarah')">🏛️ Budaya/Sejarah <span id="countBudaya">(0)</span></button>
+                                <button class="btn-filter-cat" data-category="Kuliner" onclick="toggleCategoryFilter('Kuliner')">🍳 Kuliner <span id="countKuliner">(0)</span></button>
+                                <button class="btn-filter-cat" data-category="Religi" onclick="toggleCategoryFilter('Religi')">🕌 Religi <span id="countReligi">(0)</span></button>
+                            </div>
+                        </div>
+
+                        <div class="sort-filter-row">
+                            <div class="filter-group-inline">
+                                <label for="filterCity">📍 Wilayah:</label>
+                                <select id="filterCity" class="styled-input inline-filter" onchange="filterDanRenderRapi()">
+                                    <option value="Semua">🌍 Semua Wilayah</option>
+                                </select>
+                            </div>
+                            <div class="filter-group-inline">
+                                <label for="sortBy">𔔀 Urutkan:</label>
+                                <select id="sortBy" class="styled-input inline-filter" onchange="filterDanRenderRapi()">
+                                    <option value="name-asc">🔤 Nama Wisata (A - Z)</option>
+                                    <option value="name-desc">🔤 Nama Wisata (Z - A)</option>
+                                    <option value="price-asc">💵 Harga Terendah</option>
+                                    <option value="price-desc">💵 Harga Tertinggi</option>
+                                    <option value="capacity-desc">👥 Kapasitas Terbesar</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-layout">
+                        <div class="table-container">
+
+                            <table class="wisata-table">
+                                <thead>
+                                    <tr>
+                                        <th>Informasi Destinasi</th>
+                                        <th>Kategori</th>
+                                        <th>Kapasitas</th>
+                                        <th>Harga Satuan</th>
+                                        <th style="text-align: center;">Aksi Manajemen</th>
+                                    </tr>
+                                </thead>
+<tbody id="tableBodyWisata"></tbody>
+                           </table>
+
+<div class="pagination-container" style="display: flex; flex-direction: column; align-items: center; gap: 30px; margin-top: 20px; padding: 15px 0; width: 100%; clear: both;">
+    
+    <span id="pageInfo" style="font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">Halaman 1 dari 1</span>
+    
+    <div class="pagination-buttons" style="display: flex; gap: 12px; width: 100%; max-width: 320px;">
+        <button id="btnPrevPage" class="btn-action-sm" onclick="changePage(-1)" style="flex: 1; padding: 10px; cursor: pointer; text-align: center; font-weight: 600;" disabled>
+            ⬅️ Prev
+        </button>
+        <button id="btnNextPage" class="btn-action-sm" onclick="changePage(1)" style="flex: 1; padding: 10px; cursor: pointer; text-align: center; font-weight: 600;" disabled>
+            Next ➡️
+        </button>
+    </div>
+</div>
+</div>
+
+<div class="preview-container" id="detailPreviewBox">
+    <div id="map" class="embedded-map-frame" style="position: relative;">
+        <button id="btnFullMap" class="btn-fullmap-floating" onclick="toggleFullscreenMap()" aria-label="Lihat Peta Penuh">
+            <span class="icon-expand">🔲</span> Full Map
+        </button>
+    </div>
+    <div class="empty-preview-state" id="mapPlaceholderText">
+        <div class="preview-icon">🗺️</div>
+        <h4>Peta Destinasi Nusantara</h4>
+        <p>Klik tombol <b>🔎 Detail</b> pada tabel untuk melihat lokasi spesifik, gambaran rincian paket harga, beserta prakiraan kondisi cuaca langsung di atas.</p>
+    </div>
+</div>
+                    </div>
+
+                </div>
+            </main>
         </div>
 
-        <!-- Admin Input Card -->
-       <!-- Cari bagian Admin Input Card di index.html dan ganti dengan ini -->
-<div id="adminPanel" class="card">
-    <h4 style="margin:0">Tambah Wisata (Firestore)</h4>
-    <input type="text" id="name" placeholder="Nama Wisata">
-    <input type="text" id="latlng" placeholder="Koordinat (contoh: -7.6, 110.2)">
-    
-    <!-- Input Baru -->
-    <select id="category" class="styled-input">
-        <option value="Alam">🌿 Alam</option>
-        <option value="Taman Bermain">🎡 Taman Bermain</option>
-        <option value="Budaya/Sejarah">🏛️ Budaya/Sejarah</option>
-        <option value="Kuliner">🍲 Kuliner</option>
-        <option value="Religi">🕌 Religi</option>
-    </select>
-    <input type="number" id="capacity" placeholder="Kapasitas Wisatawan (Orang)">
-    
-    <input type="text" id="imgUrl" placeholder="URL Gambar (https://...)">
-    <textarea id="desc" placeholder="Deskripsi singkat"></textarea>
-    <button class="btn" onclick="saveData()">Simpan ke Firestore</button>
-</div>
+        <footer class="main-footer">
+            <div class="footer-content">
+                <div class="footer-wm">
+                    <span>© 2026 <b>Jelajah Nusantara</b>. All Rights Reserved.</span>
+                </div>
+                <div class="footer-stats">
+                    <div class="stat-box"><span class="stat-label">🌍 Total:</span><b class="stat-value" id="statTotal">0</b></div>
+                    <div class="stat-box"><span class="stat-label">🌲 Alam:</span><b class="stat-value" id="statAlam">0</b></div>
+                    <div class="stat-box"><span class="stat-label">🎡 Taman:</span><b class="stat-value" id="statTaman">0</b></div>
+                    <div class="stat-box"><span class="stat-label">🏛️ Sejarah:</span><b class="stat-value" id="statBudaya">0</b></div>
+                    <div class="stat-box"><span class="stat-label">🍳 Kuliner:</span><b class="stat-value" id="statKuliner">0</b></div>
+                    <div class="stat-box"><span class="stat-label">🕌 Religi:</span><b class="stat-value" id="statReligi">0</b></div>
+                </div>
+            </div>
+        </footer>
     </div>
 
-    <div id="map"></div>
+    <div id="customModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-icon" id="modalIcon">🔔</div>
+            <h3 id="modalTitle">Notifikasi</h3>
+            <p id="modalMessage">Pesan di sini...</p>
+            <div class="modal-actions" id="modalActions"></div>
+        </div>
+    </div>
 
-    <!-- Firebase SDK (Compat mode) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <!-- Custom JS -->
     <script src="index.js"></script>
 </body>
 </html>
