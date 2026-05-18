@@ -1,74 +1,837 @@
-:root { --apple-blue: #007aff; --glass: rgba(255, 255, 255, 0.85); }
-body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, sans-serif; overflow: hidden; }
-#map { width: 100%; height: 100vh; z-index: 1; }
+:root {
+    /* Light Mode Variables */
+    --bg-main: #f4f6f9;
+    --bg-card: rgba(255, 255, 255, 0.8);
+    --bg-header: rgba(255, 255, 255, 0.9);
+    --border-color: rgba(0, 0, 0, 0.08);
+    --text-primary: #1d1d1f;
+    --text-secondary: #6e6e73;
+    --input-bg: #ffffff;
+    --table-header-bg: #f5f5f7;
+    --table-row-hover: rgba(0, 122, 255, 0.04);
+    --price-section-bg: #f8f9fa;
+    --preview-box-bg: #f5f5f7;
+    --preview-inner-bg: #ffffff;
+    --search-result-bg: #ffffff;
+    --map-filter: none;
+    
+    /* Global Accent Colors */
+    --accent-blue: #007aff;
+    --accent-green: #34c759;
+    --accent-red: #ff3b30;
+    --accent-orange: #ff9500;
+    --glass-blur: blur(12px);
+    --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04);
+}
 
-.ui-container {
-    position: absolute; top: 10px; left: 10px; right: 10px;
-    z-index: 1000; display: flex; flex-direction: column; gap: 8px; max-width: 400px;
+[data-theme="dark"] {
+    /* Dark Mode Variables */
+    --bg-main: #0f1014;
+    --bg-card: rgba(22, 24, 30, 0.8);
+    --bg-header: rgba(22, 24, 30, 0.9);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --text-primary: #f5f5f7;
+    --text-secondary: #a1a1aa;
+    --input-bg: #1c1e24;
+    --table-header-bg: #1c1e24;
+    --table-row-hover: rgba(0, 122, 255, 0.1);
+    --price-section-bg: #16181e;
+    --preview-box-bg: #16181e;
+    --preview-inner-bg: #1c1e24;
+    --search-result-bg: #1c1e24;
+    --map-filter: invert(90%) hue-rotate(180deg) brightness(95%) contrast(90%);
+    --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body, html {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.main-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.main-header {
+    background: var(--bg-header);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    padding: 20px 30px;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1600px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.header-content h1 {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.header-content p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+.theme-toggle-btn {
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--card-shadow);
+    transition: all 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+    transform: scale(1.05);
+    border-color: var(--accent-blue);
+}
+
+.content-container {
+    display: flex;
+    flex: 1;
+    padding: 24px;
+    gap: 24px;
+    max-width: 1600px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.sidebar-panel {
+    width: 360px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.main-content {
+    flex: 1;
+    min-width: 0;
 }
 
 .card {
-    background: var(--glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-    padding: 15px; border-radius: 18px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-    border: 1px solid rgba(255,255,255,0.4);
+    background: var(--bg-card);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-radius: 20px;
+    padding: 24px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--card-shadow);
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
-.title { margin: 0 0 10px; font-size: 18px; font-weight: 700; color: #1d1d1f; }
+.section-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 18px;
+}
 
-input, textarea {
-    width: 100%; padding: 12px; margin-top: 8px; border-radius: 10px;
-    border: 1px solid #ddd; box-sizing: border-box; font-size: 14px; outline: none;
+.form-group {
+    margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    font-size: 14px;
+    outline: none;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    transition: all 0.2s;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+}
+
+.price-section {
+    background: var(--price-section-bg);
+    border: 1px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+}
+
+.price-title {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 12px;
 }
 
 .btn {
-    background: var(--apple-blue); color: white; border: none; padding: 12px;
-    border-radius: 10px; width: 100%; margin-top: 10px; font-weight: 600; cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
 }
 
-.btn-admin-toggle { background: #555; font-size: 11px; padding: 6px; margin-top: 15px; }
+.btn-primary { background: var(--accent-blue); color: white; }
+.btn-primary:hover { background: #0066cc; transform: translateY(-1px); }
+.btn-secondary { background: #e5e5ea; color: #1d1d1f; }
+.btn-secondary:hover { background: #d1d1d6; }
+.btn-admin-toggle { background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); font-size: 11px; padding: 8px; margin-top: 8px; }
+
+.data-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 650px;
+}
+
+.controls-wrapper {
+    background: var(--price-section-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.filter-section-buttons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filter-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.category-buttons-container {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-filter-cat {
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-filter-cat:hover {
+    border-color: var(--accent-blue);
+}
+
+.btn-filter-cat.active {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
+}
+
+.btn-filter-cat span {
+    font-size: 11px;
+    opacity: 0.75;
+    margin-left: 4px;
+    font-weight: 700;
+}
+
+.btn-filter-cat.active span {
+    opacity: 1;
+}
+
+.sort-filter-row {
+    display: flex;
+    gap: 20px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 14px;
+}
+
+.filter-group-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-group-inline label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.inline-filter {
+    width: 210px;
+    padding: 8px 12px;
+}
+
+.grid-layout {
+    display: flex;
+    gap: 24px;
+    flex: 1;
+}
+
+.table-container {
+    flex: 1.3;
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    background: var(--input-bg);
+}
+
+.wisata-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.wisata-table th {
+    background: var(--table-header-bg);
+    padding: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.wisata-table td {
+    padding: 14px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.wisata-table tr:hover td {
+    background-color: var(--table-row-hover);
+}
+
+.badge-category {
+    font-size: 11px;
+    background: var(--table-header-bg);
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+}
+
+.btn-action-sm {
+    border: none;
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-right: 4px;
+}
+.btn-view { background: rgba(0, 122, 255, 0.1); color: var(--accent-blue); }
+.btn-edit { background: rgba(255, 149, 0, 0.1); color: var(--accent-orange); }
+.btn-delete { background: rgba(255, 59, 48, 0.1); color: var(--accent-red); }
 
 .search-results {
-    background: white; border-radius: 12px; max-height: 250px; overflow-y: auto;
-    display: none; margin-top: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    background: var(--search-result-bg);
+    border-radius: 12px;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    margin-top: 6px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
+    position: absolute;
+    width: 100%;
+    z-index: 99;
 }
 
 .result-item {
-    padding: 12px; border-bottom: 1px solid #f2f2f2; display: flex; align-items: center; gap: 12px; cursor: pointer;
-}
-
-.result-item img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; }
-
-#adminPanel { display: none; }
-
-@media (min-width: 768px) { .ui-container { top: 20px; left: 20px; } }
-
-
-
-/* Tambahkan ini di style.css */
-.styled-input {
-    width: 100%;
     padding: 12px;
-    margin-top: 8px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    background: white;
-    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.result-item:hover { background: var(--table-header-bg); }
+
+/* FRAME PREVIEW & MAPS LAYOUT */
+.preview-container {
+    flex: 1;
+    background: var(--preview-box-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    min-height: 520px;
+    position: sticky;
+    top: 100px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.embedded-map-frame {
+    width: 100%;
+    height: 240px;
+    flex-shrink: 0;
+    z-index: 10;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Modifikasi filter ubin map agar mengikuti warna dark mode */
+.leaflet-tile-container {
+    filter: var(--map-filter);
+}
+
+.empty-preview-state { padding: 60px 20px; text-align: center; color: var(--text-secondary); flex: 1; }
+.preview-icon { font-size: 54px; margin-bottom: 16px; }
+
+/* MAIN FOOTER WITH GLASSMORPHISM */
+.main-footer {
+    background: var(--bg-header);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-top: 1px solid var(--border-color);
+    padding: 20px 30px;
+    margin-top: auto;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1600px;
+    margin: 0 auto;
+    width: 100%;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.footer-wm { font-size: 13px; color: var(--text-secondary); }
+.footer-stats { display: flex; gap: 12px; flex-wrap: wrap; }
+.stat-box {
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+.stat-label { color: var(--text-secondary); font-weight: 500; }
+.stat-value { color: var(--text-primary); font-weight: 700; }
+
+/* GLASSMORPHISM CUSTOM MODAL */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999; opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+.modal-card {
+    background: var(--bg-card);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--card-shadow);
+    padding: 28px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center;
+    transform: scale(0.85); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.modal-overlay.active .modal-card { transform: scale(1); }
+.modal-icon { font-size: 40px; margin-bottom: 14px; }
+.modal-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--text-primary); }
+.modal-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 24px; }
+.modal-actions { display: flex; gap: 12px; justify-content: center; }
+.modal-btn { padding: 10px 20px; font-size: 13px; font-weight: 600; border-radius: 10px; border: none; cursor: pointer; flex: 1; transition: all 0.2s; }
+.modal-btn-confirm { background: var(--accent-blue); color: white; }
+.modal-btn-confirm:hover { background: #0066cc; }
+.modal-btn-danger { background: var(--accent-red); color: white; }
+.modal-btn-danger:hover { background: #cc2e24; }
+.modal-btn-cancel { background: var(--table-header-bg); color: var(--text-primary); border: 1px solid var(--border-color); }
+.modal-btn-cancel:hover { background: var(--border-color); }
+
+@media (max-width: 1200px) {
+    .content-container { flex-direction: column; }
+    .sidebar-panel { width: 100%; }
+}
+@media (max-width: 768px) {
+    .grid-layout { flex-direction: column-reverse; }
+    .sort-filter-row { flex-direction: column; }
+    .inline-filter { width: 100%; }
+    .footer-content { flex-direction: column; text-align: center; }
+    .footer-stats { justify-content: center; gap: 8px; }
+}
+
+
+/* --- KUSTOMISASI INDIKATOR WARNA PIN MAP BERDASARKAN KATEGORI --- */
+.custom-marker-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.marker-pin-glow {
+    width: 34px;
+    height: 34px;
+    border-radius: 50% 50% 50% 0; /* Membuat bentuk mirip pin drop tetesan air */
+    transform: rotate(-45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+}
+
+.marker-pin-glow:hover {
+    transform: rotate(-45deg) scale(1.15); /* Animasi membesar saat di-hover mouse */
+}
+
+/* Memutar kembali emoji di dalamnya agar posisinya tegak lurus */
+.marker-emoji-inside {
+    transform: rotate(45deg);
+    font-size: 16px;
+    display: block;
+    margin-top: -2px;
+    margin-left: -2px;
+}
+
+/* Variasi Warna Solid + Efek Glow Neon Sesuai Tema */
+.marker-alam { 
+    background: #34c759; 
+    box-shadow: 0 0 12px rgba(52, 199, 89, 0.6); 
+}
+.marker-taman { 
+    background: #007aff; 
+    box-shadow: 0 0 12px rgba(0, 122, 255, 0.6); 
+}
+.marker-budaya { 
+    background: #ff3b30; 
+    box-shadow: 0 0 12px rgba(255, 59, 48, 0.6); 
+}
+.marker-kuliner { 
+    background: #ff9500; 
+    box-shadow: 0 0 12px rgba(255, 149, 0, 0.6); 
+}
+.marker-religi { 
+    background: #af52de; 
+    box-shadow: 0 0 12px rgba(175, 82, 222, 0.6); 
+}
+.marker-default { 
+    background: #8e8e93; 
+}
+
+/* --- TOMBOL FLOATING FULL MAP & STYLING FULLSCREEN --- */
+.btn-fullmap-floating {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 1000; /* Memastikan tombol berada di atas ubin peta Leaflet */
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #1d1d1f;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: all 0.2s ease;
+}
+
+/* Penyesuaian tombol saat dashboard berada di mode gelap */
+[data-theme="dark"] .btn-fullmap-floating {
+    background: rgba(28, 30, 36, 0.75);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #f5f5f7;
+}
+
+.btn-fullmap-floating:hover {
+    background: var(--accent-blue);
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 122, 255, 0.3);
+}
+
+.btn-fullmap-floating .icon-expand {
+    font-size: 13px;
+}
+
+[data-theme="dark"] #map:fullscreen .btn-fullmap-floating {
+    background: rgba(28, 30, 36, 0.9);
+    color: #f5f5f7;
 }
 
 
 
-.btn-edit-small {
-    background: #f0f0f0;
-    border: 1px solid #ddd;
-    padding: 5px 10px;
+/* --- TRICK CSS: MEMBUAT MAP MAKSIMAL DI JENDELA BROWSER --- */
+.map-window-maximize {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 99999 !important; /* Berada di atas seluruh elemen dashboard */
+    border: none !important;
+    border-radius: 0 !important;
+    animation: popInMap 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Menggeser tombol penutup agar tidak menabrak pojok layar */
+.map-window-maximize .btn-fullmap-floating {
+    top: 24px !important;
+    right: 24px !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2) !important;
+    color: #1d1d1f !important;
+}
+
+[data-theme="dark"] .map-window-maximize .btn-fullmap-floating {
+    background: rgba(28, 30, 36, 0.95) !important;
+    color: #f5f5f7 !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Animasi transisi halus saat peta melebar */
+@keyframes popInMap {
+    from {
+        opacity: 0;
+        transform: scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+
+
+/* --- MERAPIKAN STYLE MAP WINDOW MAXIMIZE --- */
+.map-window-maximize {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 99999 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    animation: popInMap 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.map-window-maximize #btnFullMap {
+    top: 20px !important;
+    right: 20px !important;
+    background: #ffffff !important;
+    color: #1d1d1f !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25) !important;
+}
+
+[data-theme="dark"] .map-window-maximize #btnFullMap {
+    background: #1c1e24 !important;
+    color: #f5f5f7 !important;
+}
+
+/* --- KUSTOMISASI KOTAK POPUP INFO DI DALAM TITIK MAP --- */
+.custom-leaflet-popup .leaflet-popup-content-wrapper {
+    padding: 0 !important;
+    overflow: hidden;
+    border-radius: 16px !important;
+    background: var(--bg-card) !important;
+    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.15) !important;
+}
+
+.custom-leaflet-popup .leaflet-popup-content {
+    margin: 0 !important;
+    width: 300px !important;
+    color: var(--text-primary) !important;
+}
+
+.custom-leaflet-popup .leaflet-popup-close-button {
+    color: #ffffff !important;
+    z-index: 10;
+    padding: 8px !important;
+    font-size: 16px !important;
+}
+
+/* Komponen Card di Dalam Popup */
+.map-popup-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.popup-img-header {
+    height: 120px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.popup-badge {
+    position: absolute;
+    bottom: 10px;
+    left: 12px;
+    background: rgba(0, 122, 255, 0.85);
+    color: white;
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+
+.popup-body {
+    padding: 14px;
+}
+
+.popup-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    color: var(--text-primary);
+}
+
+.popup-location {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin: 0 0 10px 0;
+}
+
+.popup-desc {
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    /* Potongan teks dihapus agar deskripsi muncul full */
+    display: block; 
+    overflow: visible;
+}
+
+/* Kisi Informasi Ringkas */
+.popup-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.03);
+    padding: 8px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+[data-theme="dark"] .popup-info-grid {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.p-info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.p-label {
+    font-size: 9px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.p-val {
+    font-size: 11.5px;
+    color: var(--text-primary);
+}
+
+.popup-promo-tag {
+    background: rgba(255, 149, 0, 0.15);
+    border: 1px dashed var(--accent-orange);
+    color: var(--accent-orange);
+    padding: 6px;
     border-radius: 6px;
     font-size: 11px;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 5px;
-    transition: 0.2s;
+    margin-bottom: 10px;
+    text-align: center;
 }
 
-.btn-edit-small:hover {
-    background: #e0e0e0;
+/* Tombol Aksi di dalam popup */
+.btn-popup-action {
+    width: 100%;
+    padding: 8px;
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-popup-action:hover {
+    background: #0056b3;
 }
