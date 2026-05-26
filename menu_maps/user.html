@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jelajah Nusantara - Eksplorasi Destinasi Impianmu</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="user.css">
+</head>
+<body>
+
+    <div id="authGatekeeperModal" class="modal-overlay opacity-0 pointer-events-none">
+        <div class="modal-card glass-card">
+            <div class="modal-close" onclick="closeAuthGatekeeper()"><i class="fa-solid fa-xmark"></i></div>
+            <h3>🔑 Akses Terbatas</h3>
+            <p style="margin: 10px 0; font-size: 13px; color: var(--text-secondary);">
+                Silakan masuk akun terlebih dahulu untuk menikmati fitur penuh.
+            </p>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeAuthGatekeeper()">Batal</button>
+                <button class="modal-btn modal-btn-confirm" onclick="redirectToAuth('login')">Masuk Ke Akun</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+<aside class="slim-nav">
+            <div class="nav-top">
+                <button class="nav-icon-btn brand"><i class="fa-solid fa-bars"></i></button>
+                <button id="btnNavHome" class="nav-icon-btn active" onclick="switchMenu('home')" title="Halaman Utama"><i class="fa-solid fa-house"></i></button>
+                <button id="btnNavMaps" class="nav-icon-btn" onclick="switchMenu('maps')" title="Jelajah Peta"><i class="fa-solid fa-layer-group"></i></button>
+                
+                <button class="nav-icon-btn" onclick="bukaModalOrderan()" title="Orderan Saya">
+                    <i class="fa-solid fa-ticket"></i>
+                </button>
+
+                <button class="nav-icon-btn" onclick="jalankanProteksiFitur(openWishlistModal)" title="Favorit Saya">
+                    <i class="fa-solid fa-heart"></i>
+                    <span id="wishlistCount" class="badge">0</span>
+                </button>
+                <button class="nav-icon-btn"><i class="fa-solid fa-list-check"></i></button>
+                <button class="nav-icon-btn"><i class="fa-solid fa-gear"></i></button>
+            </div>
+            <div class="nav-bottom">
+                <button class="nav-icon-btn" onclick="toggleTheme()"><i class="fa-solid fa-circle-half-stroke"></i></button>
+                <button class="nav-icon-btn" onclick="prosesLogoutUser()" title="Keluar Akun">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+        </aside>
+
+        <div class="floating-top-bar">
+            <div class="map-brand-title">📍 NUSANTARA RADAR V1.0</div>
+            <div class="top-bar-right-menu">
+                <div class="map-stats-pill" id="globalMapStats">
+                    <span>Total: <b id="statTotal">0</b></span> |
+                    <span>🌲 <b id="statAlam">0</b></span> |
+                    <span>🍳 <b id="statKuliner">0</b></span>
+                </div>
+                <button class="btn-login-top" id="profileNavBtn" onclick="redirectToAuth('login')">
+                    <i class="fa-solid fa-right-to-bracket"></i> Masuk
+                </button>
+            </div>
+        </div>
+
+        <main id="homePageWorkspace" class="homepage-container">
+            <div class="homepage-slideshow">
+                <div class="slide active" style="background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1920')"></div>
+                <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1537996194471-e657df975ab4?q=80&w=1920')"></div>
+                <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1583212292454-1fe6229603b7?q=80&w=1920')"></div>
+                <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1626125345510-4603468eedfb?q=80&w=1920')"></div>
+            </div>
+            <div class="homepage-overlay"></div>
+            <div class="hero-content-wrapper">
+                <div class="hero-text-card">
+                    <span class="welcome-badge">✨ Wonderful Indonesia</span>
+                    <h1 class="hero-main-title">Eksplorasi Keindahan <br><span class="gradient-text">Nusantara</span></h1>
+                    <p class="hero-description">Temukan pesona destinasi wisata tersembunyi, keunikan budaya lokal, dan petualangan seru di setiap sudut pulau Indonesia melalui radar interaktif kami.</p>
+                    <div class="hero-action-buttons">
+                        <button class="cta-primary-btn" onclick="switchMenu('maps')">
+                            Mulai Penjelajahan <i class="fa-solid fa-compass fa-spin-hover"></i>
+                        </button>
+                        <button class="cta-secondary-btn" onclick="document.getElementById('btnNavHome').click()">
+                            Pelajari Fitur
+                        </button>
+                    </div>
+                </div>
+                <div class="hero-features-grid">
+                    <div class="feature-glass-box">
+                        <div class="feat-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+                        <h4>Peta Live</h4>
+                        <p>Pemetaan koordinat destinasi secara akurat.</p>
+                    </div>
+                    <div class="feature-glass-box">
+                        <div class="feat-icon"><i class="fa-solid fa-ticket"></i></div>
+                        <h4>E-Ticket</h4>
+                        <p>Booking tiketmu di sini, instan tanpa antre.</p>
+                    </div>
+                    <div class="feature-glass-box">
+                        <div class="feat-icon"><i class="fa-solid fa-cloud-sun"></i></div>
+                        <h4>Info Cuaca</h4>
+                        <p>Pantau cuaca sebelum menuju ke tempat wisata.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <aside id="mapsSidebarWorkspace" class="main-sidebar" style="display: none;">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Pencarian Cepat</h3>
+                <div class="search-box-wrapper">
+                    <i class="fa-solid fa-magnifying-glass search-inside-icon"></i>
+                    <input type="text" id="searchInput" placeholder="Mau liburan kemana?..." oninput="handleSearchSearch()">
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Filter Kategori</h3>
+                <div class="category-tags-grid">
+                    <button class="tag-btn active" data-category="All" onclick="toggleCategoryFilter('All')">Semua</button>
+                    <button class="tag-btn" data-category="Alam" onclick="toggleCategoryFilter('Alam')"><i class="fa-solid fa-tree"></i> Alam</button>
+                    <button class="tag-btn" data-category="Taman Bermain" onclick="toggleCategoryFilter('Taman Bermain')"><i class="fa-solid fa-icons"></i> Taman Bermain</button>
+                    <button class="tag-btn" data-category="Budaya/Sejarah" onclick="toggleCategoryFilter('Budaya/Sejarah')"><i class="fa-solid fa-landmark"></i> Budaya</button>
+                    <button class="tag-btn" data-category="Kuliner" onclick="toggleCategoryFilter('Kuliner')"><i class="fa-solid fa-utensils"></i> Kuliner</button>
+                </div>
+                <div class="extra-filters-row">
+                    <select id="filterCity" onchange="filterDanRenderUserSide()">
+                        <option value="Semua">📍 Wilayah</option>
+                    </select>
+                    <select id="sortBy" onchange="filterDanRenderUserSide()">
+                        <option value="name-asc">A - Z</option>
+                        <option value="price-asc">💵 Murah</option>
+                        <option value="price-desc">💵 Mahal</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="fleet-section">
+                <div class="section-header-inline">
+                    <h3 class="sidebar-title" style="margin-bottom:0;">Destinasi Terpopuler</h3>
+                    <div class="nav-arrows">
+                        <button class="arrow-btn"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button class="arrow-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div id="sidebarWisataList" class="vertical-scroll-list"></div>
+            </div>
+        </aside>
+
+        <main id="mapsViewWorkspace" class="map-view-workspace" style="display: none;">
+            <div id="map"></div>
+            <div id="detailPreviewBox" class="floating-detail-card-container">
+                <div class="empty-floating-state">
+                    <i class="fa-solid fa-location-crosshairs"></i>
+                    <p>Pilih salah satu destinasi di panel kiri atau penanda peta untuk melihat eksplorasi live</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="bookingModal" class="modal-overlay">
+        <div class="modal-card wide-modal">
+            <div class="modal-close" onclick="closeBookingModal()"><i class="fa-solid fa-xmark"></i></div>
+            <h3 id="bookTitle">🎟️ Form Pemesanan Tiket Digital</h3>
+            <div class="booking-form-grid" style="margin-top: 15px;">
+                <div class="form-group">
+                    <label>Nama Pemesan</label>
+                    <input type="text" id="bookCustomerName" placeholder="Masukkan nama lengkap">
+                </div>
+                <div class="form-group">
+                    <label>Tanggal Kunjungan</label>
+                    <input type="date" id="bookDate">
+                </div>
+                <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div class="form-group">
+                        <label>Jenis Paket</label>
+                        <select id="bookTicketType" onchange="hitungTotalBayar()">
+                            <option value="single">🎟️ Tiket Satuan</option>
+                            <option value="bundling">👥 Paket Bundling</option>
+                            <option value="promo" id="optPromo">🔥 Paket Promo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Jumlah</label>
+                        <input type="number" id="bookQuantity" value="1" min="1" oninput="hitungTotalBayar()">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 5px;">
+                    <label>Metode Pembayaran</label>
+                    <select id="bookPaymentMethod">
+                        <option value="qris">📱 QRIS (Konfirmasi Instan)</option>
+                        <option value="transfer">🏦 Transfer Bank (Manual)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="billing-summary">
+                <div class="bill-row"><span>Harga Dasar:</span><span id="lblBasePrice">Rp 0</span></div>
+                <div class="bill-row total-row"><span>Total Pembayaran:</span><span id="lblTotalPrice">Rp 0</span></div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeBookingModal()">Batal</button>
+                <button class="modal-btn modal-btn-confirm" onclick="prosesCheckoutTiket()">Lanjut Pembayaran</button>
+            </div>
+        </div>
+    </div>
+
+ <div id="customModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-close" onclick="document.getElementById('customModal').classList.remove('active'); clearInterval(window.qrisInterval);"><i class="fa-solid fa-xmark"></i></div>
+            <div style="text-align: center; margin-bottom: 10px;">
+                <span id="modalIcon" style="font-size: 30px;">✨</span>
+                <h3 id="modalTitle" style="margin-top: 5px;">Notifikasi</h3>
+            </div>
+            <div id="modalMessage"></div>
+            <div id="modalActions" class="modal-actions"></div>
+        </div>
+    </div>
+
+    <div id="modalOrderan" class="modal-overlay">
+        <div class="modal-card glass-card animate-fade-in" style="max-width: 500px; width: 92%;">
+            <div class="modal-close" onclick="tutupModalOrderan()">
+                <i class="fa-solid fa-xmark"></i>
+            </div>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <span style="font-size: 32px;">🎟️</span>
+                <h3 style="margin-top: 8px; color: var(--accent-glow);">E-Tiket Saya</h3>
+                <p style="font-size: 12px; color: var(--text-secondary);">Daftar riwayat pemesanan tiket perjalanan Anda</p>
+            </div>
+            
+            <div id="listTiketContainer" style="max-height: 45vh; overflow-y: auto; padding-right: 5px; display: flex; flex-direction: column; gap: 12px;">
+                <div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 13px;">
+                    Memuat data tiket...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="user.js"></script>
+</body>
+</html>

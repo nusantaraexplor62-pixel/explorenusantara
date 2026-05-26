@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jelajah Nusantara - Masuk & Daftar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="login.css">
+</head>
+<body class="theme-dark bg-[#0b0c10] text-[#f5f6f8] min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-x-hidden">
+
+    <div class="absolute inset-0 z-0 pointer-events-none" style="background: var(--bg-gradient);"></div>
+
+    <div class="fixed top-6 right-6 z-50">
+        <button id="themeToggleBtn" onclick="toggleThemeInterface()" class="w-11 h-11 rounded-xl flex items-center justify-center border border-emerald-500/20 glass-card text-sky-400 hover:scale-105 active:scale-[0.95] transition-all shadow-lg">
+            <i class="fas fa-sun text-lg" id="themeIcon"></i>
+        </button>
+    </div>
+
+    <div class="w-full max-w-[460px] z-10 my-8 animate-fade-in">
+        <div class="glass-card rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+            
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-400 text-white text-2xl shadow-xl shadow-blue-500/20 mb-3">
+                    <i class="fa-solid fa-map-location-dot animate-bounce"></i>
+                </div>
+                <h2 class="text-2xl font-extrabold tracking-tight" style="color: var(--text-main);">Jelajah Nusantara</h2>
+                <p id="authSubtitle" class="text-xs mt-1.5 font-medium" style="color: var(--text-sub);">Silakan daftarkan akun baru untuk pemesanan tiket wisata</p>
+            </div>
+
+            <div class="flex p-1.5 bg-black/20 dark:bg-black/40 border rounded-2xl mb-6" style="border-color: var(--card-border);">
+                <button id="tabRegister" class="flex-1 py-2.5 text-center text-xs font-bold rounded-xl transition-all duration-300 bg-blue-600 text-white shadow-md" onclick="switchAuthMode('register')">
+                    <i class="fa-solid fa-user-plus mr-1.5"></i>Daftar
+                </button>
+                <button id="tabLogin" class="flex-1 py-2.5 text-center text-xs font-bold rounded-xl transition-all duration-300 text-slate-400 hover:text-white" onclick="switchAuthMode('login')">
+                    <i class="fa-solid fa-arrow-right-to-bracket mr-1.5"></i>Masuk
+                </button>
+            </div>
+
+            <form id="authForm" onsubmit="handleAuthFormSubmit(event)" class="space-y-4">
+                
+                <div id="groupName" class="flex flex-col gap-1.5">
+                    <label class="text-xs font-semibold" style="color: var(--text-sub);"><i class="fa-solid fa-user w-4"></i> Nama Lengkap</label>
+                    <input type="text" id="authName" placeholder="Masukkan nama lengkap sesuai identitas" class="input-custom w-full px-4 py-3 rounded-xl text-sm outline-none font-medium" required>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-semibold" style="color: var(--text-sub);"><i class="fa-solid fa-envelope w-4"></i> Alamat Email</label>
+                    <input type="email" id="authEmail" placeholder="contoh@email.com" class="input-custom w-full px-4 py-3 rounded-xl text-sm outline-none font-medium" required>
+                </div>
+
+                <div id="groupPhone" class="flex flex-col gap-1.5">
+                    <label class="text-xs font-semibold" style="color: var(--text-sub);"><i class="fa-solid fa-phone w-4"></i> Nomor Telepon / WhatsApp</label>
+                    <input type="tel" id="authPhone" placeholder="08xxxxxxxxxx" class="input-custom w-full px-4 py-3 rounded-xl text-sm outline-none font-medium" required>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-semibold" style="color: var(--text-sub);"><i class="fa-solid fa-lock w-4"></i> Kata Sandi (Password)</label>
+                    <div class="relative w-full">
+                        <input type="password" id="authPassword" placeholder="••••••••" class="input-custom w-full pl-4 pr-12 py-3 rounded-xl text-sm outline-none font-medium" required>
+                        <button type="button" onclick="toggleViewPassword()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors">
+                            <i id="eyeIcon" class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="groupTerms" class="pt-2">
+                    <label class="flex items-start gap-3 cursor-pointer group">
+                        <input type="checkbox" id="authTerms" class="checkbox-custom mt-0.5 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" required>
+                        <span class="text-[11px] leading-relaxed transition-colors group-hover:text-white" style="color: var(--text-sub);">
+                            Saya menyatakan data di atas benar & menyetujui seluruh <span class="text-blue-500 font-bold underline">Peraturan Sistem Syarat & Ketentuan</span> pemesanan e-tiket Jelajah Nusantara.
+                        </span>
+                    </label>
+                </div>
+
+                <button type="submit" id="btnSubmitAuth" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-blue-600/20 hover:opacity-90 active:scale-[0.99] transition-all mt-4 flex items-center justify-center gap-2">
+                    <span id="btnSubmitText">Buat Akun Baru</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+
+    
+
+    <div id="customAlertModal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300 p-4">
+        <div class="glass-card rounded-2xl p-6 text-center max-w-sm w-full scale-90 transition-all duration-300 shadow-2xl" id="alertCard">
+            <div id="alertIcon" class="text-4xl mb-3 animate-pulse">🎉</div>
+            <h3 id="alertTitle" class="text-base font-bold mb-1" style="color: var(--text-main);">Notifikasi</h3>
+            <p id="alertMessage" class="text-xs leading-relaxed mb-5" style="color: var(--text-sub);">Pesan sistem...</p>
+            <button onclick="closeAlertModalWindow()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-md transition-colors uppercase tracking-wider">Mengerti</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <script src="login.js"></script>
+</body>
+</html>

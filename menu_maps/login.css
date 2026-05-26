@@ -1,0 +1,104 @@
+:root {
+    --bg-gradient: radial-gradient(circle at 10% 20%, rgba(0, 122, 255, 0.08) 0%, transparent 40%),
+                   radial-gradient(circle at 90% 80%, rgba(0, 242, 254, 0.06) 0%, transparent 40%);
+    --card-bg: rgba(255, 255, 255, 0.75);
+    --card-border: rgba(0, 0, 0, 0.06);
+    --text-main: #1c1e21;
+    --text-sub: #65676b;
+    --input-bg: rgba(0, 0, 0, 0.03);
+    --input-border: rgba(0, 0, 0, 0.08);
+    --focus-shadow: rgba(0, 122, 255, 0.15);
+}
+
+.theme-dark {
+    --bg-gradient: radial-gradient(circle at 10% 20%, rgba(0, 122, 255, 0.12) 0%, transparent 40%),
+                   radial-gradient(circle at 90% 80%, rgba(0, 242, 254, 0.08) 0%, transparent 40%);
+    --card-bg: rgba(19, 21, 26, 0.65);
+    --card-border: rgba(255, 255, 255, 0.06);
+    --text-main: #f5f6f8;
+    --text-sub: #8e95a5;
+    --input-bg: rgba(255, 255, 255, 0.03);
+    --input-border: rgba(255, 255, 255, 0.08);
+    --focus-shadow: rgba(0, 242, 254, 0.2);
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid var(--card-border);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input-custom {
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--text-main);
+    transition: all 0.25s ease;
+}
+
+.input-custom:focus {
+    border-color: #007aff;
+    box-shadow: 0 0 0 4px var(--focus-shadow);
+}
+
+/* Penyesuaian Visual Elemen Dropdown Saat Dikunci */
+.input-custom:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: rgba(0, 0, 0, 0.05) !important;
+}
+
+.theme-dark select.input-custom option {
+    background-color: #13151a;
+    color: #f5f6f8;
+}
+
+/* Custom Checkbox Chrome */
+.checkbox-custom {
+    appearance: none;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--input-border);
+    padding: 9px;
+    border-radius: 6px;
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+}
+
+.checkbox-custom:checked {
+    background-color: #007aff;
+    border-color: #007aff;
+}
+
+.checkbox-custom:checked:after {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 10px;
+    color: #fff;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* ... baris kode atas tetap sama ... */
+
+.checkbox-custom:checked:after {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 10px;
+    color: #fff;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+/* Kurung kurawal ganda yang berlebih di sini sudah dibersihkan */
